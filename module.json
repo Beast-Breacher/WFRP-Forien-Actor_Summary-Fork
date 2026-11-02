@@ -1,0 +1,65 @@
+{
+  "id": "forien-actors-summary",
+  "title": "Forien's Actors Summary",
+  "description": "GM overview of world actors, items and attributes. Compatibility maintenance fork of Forien’s original module.",
+  "authors": [
+    {
+      "name": "Forien",
+      "discord": "forien",
+      "url": "https://www.patreon.com/foundryworkshop"
+    },
+    {
+      "name": "Beast-Breacher",
+      "url": "https://github.com/Beast-Breacher"
+    }
+  ],
+  "url": "https://github.com/Beast-Breacher/WFRP-Forien-Actor_Summary-Fork",
+  "manifest": "https://github.com/Beast-Breacher/WFRP-Forien-Actor_Summary-Fork/releases/latest/download/module.json",
+  "download": "https://github.com/Beast-Breacher/WFRP-Forien-Actor_Summary-Fork/releases/download/v0.1.4-beta.1/forien-actors-summary.zip",
+  "readme": "https://github.com/Beast-Breacher/WFRP-Forien-Actor_Summary-Fork/blob/main/README.md",
+  "changelog": "https://github.com/Beast-Breacher/WFRP-Forien-Actor_Summary-Fork/blob/main/CHANGELOG.md",
+  "bugs": "https://github.com/Beast-Breacher/WFRP-Forien-Actor_Summary-Fork/issues",
+  "version": "0.1.4-beta.1",
+  "compatibility": {
+    "minimum": "11",
+    "verified": "14.369",
+    "maximum": "14"
+  },
+  "esmodules": [
+    "forien-actors-summary.js"
+  ],
+  "styles": [
+    "forien-actors-summary.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "languages/en.json"
+    }
+  ],
+  "packs": [
+    {
+      "name": "filter-presets",
+      "label": "Filter Presets",
+      "path": "packs/filter-presets",
+      "type": "Macro",
+      "ownership": {
+        "PLAYER": "NONE",
+        "ASSISTANT": "OWNER"
+      }
+    }
+  ],
+  "flags": {
+    "hotReload": {
+      "extensions": [
+        "css",
+        "json"
+      ],
+      "paths": [
+        "languages"
+      ]
+    }
+  },
+  "socket": false
+}

@@ -1,0 +1,294 @@
+--- a/forien-actors-summary.js
++++ b/forien-actors-summary.js
+@@ -1,3 +1,4 @@
++import { Application, Dialog, Actor, TextEditor, renderTemplate, loadTemplates, readStoredObject, worldActorFromDrop, addSummaryControl, normalizePerRow, MIN_WINDOW_HEIGHT, MIN_WINDOW_WIDTH } from "./compatibility.js";
+ const forienActorsSummary = "";
+ const constants = {
+   modulePath: "modules/forien-actors-summary",
+@@ -20614,11 +20615,12 @@
+   static parseAttributes(actor, template) {
+     if (!(actor instanceof Actor) || !template)
+       return [];
+-    const lines = template.split("\n");
++    const lines = template.split("\n").map(line => line.trim()).filter(Boolean);
+     let values = [];
+     for (const line of lines) {
+       let pathValues = [];
+       let [path, label] = line.split("|", 2);
++      path = path.trim();
+       let value = foundry.utils.getProperty(actor, path);
+       label = label ? label.trim() + " " : "";
+       try {
+@@ -20636,7 +20638,8 @@
+   static getFirstRegexGroup(string, regex) {
+     try {
+       if (regex) {
+-        return string.match(regex)[1];
++        const match = string.match(regex);
++        return match?.[1] ?? string;
+       }
+     } catch {
+       Utility.notify(game.i18n.localize("Forien.ActorsSummary.Errors.RegExp"), {
+@@ -20647,12 +20650,12 @@
+     return string;
+   }
+   static parseAdditional(filter, item) {
+-    let additional = filter.additional.split(",").map((s) => s.trim());
++    let additional = (filter.additional ?? "").split(",").map((s) => s.trim()).filter(Boolean);
+     let values = [];
+     for (let field of additional) {
+       let pathValues = [];
+       let [path, label] = field.split("|", 2);
+-      let prop = path.replace("item.", "");
++      let prop = path.trim().replace(/^item\./, "");
+       let value = foundry.utils.getProperty(item, prop);
+       label = label ? label.trim() + " " : "";
+       try {
+@@ -20668,26 +20671,13 @@
+     return values;
+   }
+   static parseAdditionalValue(value, depth = 0) {
+-    if (depth > 1)
+-      return value;
+-    let values = [];
+-    depth++;
+-    if (value instanceof Array) {
+-      for (let element2 of value) {
+-        values.push(SummaryUtility.parseAdditionalValue(element2, depth));
+-      }
+-    } else if (typeof value === "string" || typeof value === "number") {
+-      let temp;
+-      if (typeof value === "number") {
+-        temp = Math.roundDecimals(value, 2);
+-      } else {
+-        temp = TextEditor.previewHTML(value, 100);
+-      }
+-      values.push(temp);
+-    } else {
+-      throw new Error();
+-    }
+-    return values;
++    if (value == null) return [];
++    if (depth > 10) throw new Error("Attribute nesting exceeds 10 levels");
++    if (Array.isArray(value)) return value.flatMap(v => SummaryUtility.parseAdditionalValue(v, depth + 1));
++    if (typeof value === "number" && Number.isFinite(value)) return [Math.round(value * 100) / 100];
++    if (typeof value === "boolean") return [String(value)];
++    if (typeof value === "string") return [TextEditor.previewHTML(value, 100)];
++    throw new Error("Unsupported attribute value");
+   }
+ }
+ const ActorFilterItem_svelte_svelte_type_style_lang = "";
+@@ -20926,7 +20916,7 @@
+     return SummaryUtility.parseAdditional(filter2, item2);
+   }
+   function openItem() {
+-    item?.sheet.render(true);
++    item?.sheet?.render(true);
+   }
+   $$self.$$set = ($$props2) => {
+     if ("item" in $$props2)
+@@ -21487,7 +21477,7 @@
+   $$self.$$.update = () => {
+     if ($$self.$$.dirty & /*filter, $actor*/
+     18) {
+-      $$invalidate(3, items = filter.type === "item" ? SummaryUtility.applyFilter($actor.items, filter.callback) : []);
++      $$invalidate(3, items = filter.type === "item" ? SummaryUtility.applyFilter($actor?.items, filter.callback) : []);
+     }
+     if ($$self.$$.dirty & /*filter, $actor*/
+     18) {
+@@ -21960,7 +21950,7 @@
+ function instance$5($$self, $$props, $$invalidate) {
+   let getIsCollapsed;
+   let isCollapsed;
+-  let $actor, $$unsubscribe_actor = noop, $$subscribe_actor = () => ($$unsubscribe_actor(), $$unsubscribe_actor = subscribe(actor, ($$value) => $$invalidate(2, $actor = $$value)), actor);
++  let $actor, $$unsubscribe_actor = noop, $$subscribe_actor = () => ($$unsubscribe_actor(), $$unsubscribe_actor = subscribe(actor, ($$value) => $$invalidate(2, $actor = $$value ?? {})), actor);
+   let $collapsed;
+   let $filtersModel;
+   $$self.$$.on_destroy.push(() => $$unsubscribe_actor());
+@@ -21974,7 +21964,9 @@
+   const collapsed = application.reactive.sessionStorage.getStore(constants.sessionStorage.appDataCollapsed);
+   component_subscribe($$self, collapsed, (value) => $$invalidate(12, $collapsed = value));
+   onMount(() => {
+-    $$subscribe_actor($$invalidate(0, actor = new TJSDocument(game.actors.get(actorId))));
++    const documentStore = new TJSDocument(game.actors.get(actorId));
++    $$subscribe_actor($$invalidate(0, actor = documentStore));
++    return () => documentStore.destroy();
+   });
+   function collapse() {
+     set_store_value(collapsed, $collapsed[actorId] = true, $collapsed);
+@@ -21986,7 +21978,7 @@
+     dispatch2("removeActor", $actor.id);
+   }
+   function openActor() {
+-    $actor?.sheet.render(true);
++    $actor?.sheet?.render(true);
+   }
+   $$self.$$set = ($$props2) => {
+     if ("actorId" in $$props2)
+@@ -21996,7 +21988,7 @@
+     if ($$self.$$.dirty & /*$collapsed, actorId*/
+     5120) {
+       $$invalidate(11, getIsCollapsed = () => {
+-        if ($collapsed === void 0)
++        if (!$collapsed || typeof $collapsed !== "object" || Array.isArray($collapsed))
+           set_store_value(collapsed, $collapsed = {}, $collapsed);
+         if ($collapsed[actorId] === void 0)
+           set_store_value(collapsed, $collapsed[actorId] = false, $collapsed);
+@@ -22276,10 +22268,10 @@
+ }
+ function instance$4($$self, $$props, $$invalidate) {
+   let dragHelper;
+-  let $actors, $$unsubscribe_actors = noop, $$subscribe_actors = () => ($$unsubscribe_actors(), $$unsubscribe_actors = subscribe(actors, ($$value) => $$invalidate(3, $actors = $$value)), actors);
++  let $actors, $$unsubscribe_actors = noop, $$subscribe_actors = () => ($$unsubscribe_actors(), $$unsubscribe_actors = subscribe(actors, ($$value) => $$invalidate(3, $actors = Array.isArray($$value) ? [...new Set($$value)].filter(id => game.actors.has(id)) : [])), actors);
+   let $position;
+   let $appStateStore;
+-  let $perRow, $$unsubscribe_perRow = noop, $$subscribe_perRow = () => ($$unsubscribe_perRow(), $$unsubscribe_perRow = subscribe(perRow, ($$value) => $$invalidate(5, $perRow = $$value)), perRow);
++  let $perRow, $$unsubscribe_perRow = noop, $$subscribe_perRow = () => ($$unsubscribe_perRow(), $$unsubscribe_perRow = subscribe(perRow, ($$value) => $$invalidate(5, $perRow = normalizePerRow($$value))), perRow);
+   $$self.$$.on_destroy.push(() => $$unsubscribe_actors());
+   $$self.$$.on_destroy.push(() => $$unsubscribe_perRow());
+   const application = getContext("#external").application;
+@@ -22297,18 +22289,13 @@
+   setContext("filtersModel", filtersModel);
+   let dragEntered = false;
+   async function drop(event) {
+-    let data = event.dataTransfer.getData("text/plain");
+-    let parsed = JSON.parse(data);
+-    if (parsed.type === "Actor") {
+-      let id = parsed.uuid.split(".")[1];
+-      let actor = game.actors.get(id);
+-      if (actor instanceof Actor) {
+-        let actorSet = new Set($actors);
+-        actorSet.add(id);
+-        actors.set(Array.from(actorSet));
+-      }
+-    }
+-    $$invalidate(12, dragEntered = false);
++    event.preventDefault();
++    try {
++      const actor = worldActorFromDrop(event, game.actors);
++      if (actor instanceof Actor) actors.set([...new Set([...$actors, actor.id])]);
++    } finally {
++      $$invalidate(12, dragEntered = false);
++    }
+   }
+   function dragenter() {
+     $$invalidate(12, dragEntered = true);
+@@ -23054,9 +23041,11 @@
+     const options = setting.options;
+     const onchangeFunctions = [];
+     let gateSet = false;
++    let pendingWrites = 0;
++    let writeQueue = Promise.resolve();
+     onchangeFunctions.push((value) => {
+       const callbackStore = this.#getStore(key);
+-      if (callbackStore && !gateSet) {
++      if (callbackStore && !gateSet && pendingWrites === 0) {
+         gateSet = true;
+         callbackStore.set(value);
+         gateSet = false;
+@@ -23082,12 +23071,22 @@
+       this.#stores.set(key, targetStore);
+       store.set(globalThis.game.settings.get(namespace, key));
+     }
+-    const storeHandler = async (value) => {
+-      if (!gateSet) {
+-        gateSet = true;
+-        await globalThis.game.settings.set(namespace, key, value);
+-      }
+-      gateSet = false;
++    const storeHandler = (value) => {
++      if (gateSet) return;
++      // Persist every edit in order; do not drop changes while an earlier write is pending.
++      const snapshot = foundry.utils.deepClone(value);
++      pendingWrites++;
++      writeQueue = writeQueue.then(async () => {
++        try {
++          await globalThis.game.settings.set(namespace, key, snapshot);
++        } catch (error) {
++          console.error(`${constants.moduleId} | Failed to save ${key}`, error);
++          globalThis.ui?.notifications?.error(`Actors Summary: failed to save ${key}. See console.`);
++        } finally {
++          pendingWrites--;
++        }
++      });
++      return writeQueue;
+     };
+     subscribeIgnoreFirst(targetStore, storeHandler);
+     this.#settings.push({
+@@ -24657,7 +24656,7 @@
+ function instance($$self, $$props, $$invalidate) {
+   let $filtersModel, $$unsubscribe_filtersModel = noop, $$subscribe_filtersModel = () => ($$unsubscribe_filtersModel(), $$unsubscribe_filtersModel = subscribe(filtersModel, ($$value) => $$invalidate(3, $filtersModel = $$value)), filtersModel);
+   let $collapsed;
+-  let $perRow, $$unsubscribe_perRow = noop, $$subscribe_perRow = () => ($$unsubscribe_perRow(), $$unsubscribe_perRow = subscribe(perRow, ($$value) => $$invalidate(4, $perRow = $$value)), perRow);
++  let $perRow, $$unsubscribe_perRow = noop, $$subscribe_perRow = () => ($$unsubscribe_perRow(), $$unsubscribe_perRow = subscribe(perRow, ($$value) => $$invalidate(4, $perRow = normalizePerRow($$value))), perRow);
+   $$self.$$.on_destroy.push(() => $$unsubscribe_filtersModel());
+   $$self.$$.on_destroy.push(() => $$unsubscribe_perRow());
+   getContext("#external").application;
+@@ -24715,7 +24714,8 @@
+     filtersModel.set(filters);
+   }
+   function input_change_input_handler() {
+-    $perRow = to_number(this.value);
++    $perRow = normalizePerRow(this.value);
++    this.value = $perRow;
+     perRow.set($perRow);
+   }
+   function filterconfig_filter_binding(value, filter, each_value, index) {
+@@ -24820,7 +24820,7 @@
+   constructor() {
+     super();
+     try {
+-      this.state.set(JSON.parse(sessionStorage.getItem(constants.sessionStorage.appState)));
++      this.state.set(readStoredObject(sessionStorage, constants.sessionStorage.appState));
+     } catch (err) {
+     }
+   }
+@@ -24873,7 +24873,7 @@
+       icon: "fas fa-chevron-up",
+       title: game.i18n.localize("Forien.ActorsSummary.App.CollapseAll"),
+       onPress: () => {
+-        const data = JSON.parse(sessionStorage.getItem(constants.sessionStorage.appDataCollapsed));
++        const data = readStoredObject(sessionStorage, constants.sessionStorage.appDataCollapsed);
+         for (let id in data) {
+           data[id] = true;
+         }
+@@ -24900,8 +24900,10 @@
+   static get rendered() {
+     return ForienActorsSummaryAPI.instance.rendered;
+   }
+-  static toggleApp(toggle) {
+-    Utility.setSetting(settings.openOnStartUp, toggle);
++  static async toggleApp(toggle) {
++    if (!game.user?.isGM) return;
++    toggle = typeof toggle === "boolean" ? toggle : !ForienActorsSummaryAPI.rendered;
++    await Utility.setSetting(settings.openOnStartUp, toggle);
+     if (toggle)
+       return ForienActorsSummaryAPI.renderApp(true);
+     return ForienActorsSummaryAPI.closeApp();
+@@ -24922,18 +24924,12 @@
+     game.modules.get(constants.moduleId).api.renderApp();
+ });
+ Hooks.on("getSceneControlButtons", (controls) => {
+-  if (!game.user?.isGM)
+-    return;
+-  const tools = controls.find((c) => c.name === "token")?.tools;
+-  const api = game.modules.get(constants.moduleId).api;
+-  const active2 = Utility.getSetting(settings.openOnStartUp);
+-  tools.push({
+-    name: "openActorsSummaryApp",
+-    title: "Forien.ActorsSummary.Control",
+-    icon: "fas fa-users",
+-    toggle: true,
+-    active: active2,
+-    onClick: api.toggleApp
+-  });
++  if (!game.user?.isGM) return;
++  addSummaryControl(controls, ForienActorsSummaryAPI, Utility.getSetting(settings.openOnStartUp));
+ });
+-//# sourceMappingURL=forien-actors-summary.js.map
++Hooks.on("deleteActor", (actor) => {
++  if (!game.user?.isGM) return;
++  const store = getSettingsInstance().getStore(settings.actors);
++  const ids = get_store_value(store);
++  if (Array.isArray(ids) && ids.includes(actor.id)) store.set(ids.filter(id => id !== actor.id));
++});

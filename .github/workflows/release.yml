@@ -1,0 +1,36 @@
+name: Test and release Actors Summary
+on:
+  push:
+    tags: ['v*']
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Regression and packaging tests
+        run: npm test
+      - name: Build module ZIP and manifest
+        run: node tools/release.mjs --repo "$GITHUB_REPOSITORY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: forien-actors-summary
+          path: dist/*
+      - name: Publish release assets
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION=$(node -p "JSON.parse(require('fs').readFileSync('module.json','utf8')).version")
+          TAG="v$VERSION"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists; increase the package version before the next release."
+          else
+            gh release create "$TAG" dist/module.json dist/forien-actors-summary.zip --target "$GITHUB_SHA" --title "Forien's Actors Summary $TAG" --generate-notes --latest
+          fi

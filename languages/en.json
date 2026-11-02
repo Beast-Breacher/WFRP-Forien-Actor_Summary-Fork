@@ -1,0 +1,69 @@
+{
+  "Forien": {
+    "ActorsSummary": {
+      "Control": "Toggle Actors Summary",
+
+      "App": {
+        "Title": "Actors Summary",
+        "Configure": "Open Configuration",
+        "CollapseAll": "Collapse All Actors",
+
+
+        "Drop": "Drop Actor",
+        "Expand": "Expand Actor",
+        "Collapse": "Collapse Actor",
+        "Remove": "Remove Actor"
+      },
+
+      "Config": {
+        "Title": "Summary Configuration",
+
+        "PerRow": "Actors per row",
+        "Filters": "Filters",
+
+        "DialogTitle": "Are you sure?",
+        "DialogText": "Do you want to delete this filter?",
+
+        "Expand": "Expand Filter",
+        "Collapse": "Collapse Filter",
+        "MoveUp": "Move Up",
+        "MoveDown": "Move Down",
+        "Delete": "Delete Filter",
+
+        "Active": "Active",
+        "Inactive": "Inactive",
+        "Toggle": "Toggle filter Active/Inactive",
+
+        "FilterName": "Filter name",
+        "FilterLabel": "Filter label",
+
+        "FilterFormat": "Filter format",
+        "Comma": "Comma separated",
+        "Bullet": "Bullet list",
+
+        "FilterType": "Filter type",
+        "Item": "Items",
+        "Attribute": "Actor's Attributes",
+
+        "FilterRegExp": "Name RegExp",
+        "FilterRegExpHint": "Must be valid Regular Expression with one capture group",
+
+        "FilterCallback": "Filter callback",
+        "FilterCallbackHint": "Must be valid JavaScript that evaluates to boolean value",
+
+        "Additional": "Additional",
+        "AdditionalHint": "Comma separated property paths of Item that lead to a single value or an Array of values. To add a label, append the path with pipe symbol and some text (i.e. 'item.damage|Damage')",
+
+        "FilterAttributes": "Attributes",
+        "FilterAttributesHint": "Every line is an attribute to display. It needs to be a valid path on actor. You can add label by appending the path with pipe and some text (i.e. 'system.currentCareer.name|Career')"
+      },
+
+      "Errors": {
+        "Callback": "There was an error evaluating a Filter Callback. Check console (F12) for details.",
+        "RegExp": "The Regular Expression for filter is not valid",
+        "Additional": "Value of 'Item.{path}' is neither an Array, String or Number.",
+        "Attribute": "Value of 'Actor.{path}' is neither an Array, String or Number."
+      }
+    }
+  }
+}

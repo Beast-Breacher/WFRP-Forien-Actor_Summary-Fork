@@ -1,0 +1,6 @@
+dist/
+node_modules/
+test-results/
+packs/**/LOCK
+packs/**/LOG
+packs/**/LOG.old
