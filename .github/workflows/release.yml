@@ -32,5 +32,5 @@ jobs:
           if gh release view "$TAG" >/dev/null 2>&1; then
             echo "Release $TAG already exists; increase the package version before the next release."
           else
-            gh release create "$TAG" dist/module.json dist/forien-actors-summary.zip --target "$GITHUB_SHA" --title "Forien's Actors Summary $TAG" --generate-notes --latest
+            gh release create "$TAG" dist/module.json dist/forien-actors-summary.zip --target "$GITHUB_SHA" --title "Forien's Actors Summary $TAG" --notes-file RELEASE-NOTES.md --latest
           fi
