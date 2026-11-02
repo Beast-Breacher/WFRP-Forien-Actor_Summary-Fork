@@ -1,5 +1,7 @@
 # Attribution and source provenance
 
+Version 0.1.4-beta.2 adds a separate `compatibility.css` header color override; the original upstream stylesheet and its source map remain unchanged.
+
 This is a compatibility maintenance fork of **Forien's Actors Summary**, original author **Forien**, upstream repository https://github.com/Foundry-Workshop/forien-actors-summary.
 
 Input: user-supplied `forien-actors-summary.zip`, original version `0.1.3-beta`.

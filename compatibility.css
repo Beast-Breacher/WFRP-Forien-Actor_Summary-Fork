@@ -1,0 +1,5 @@
+/* Keep the original Svelte title readable with modern Foundry/system themes. */
+#fas-actors-summary .window-header,
+#fas-actors-summary .window-header .window-title {
+  color: #fff;
+}

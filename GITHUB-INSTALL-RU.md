@@ -11,8 +11,8 @@
 Версии в `module.json` и `package.json` должны совпадать. После загрузки файлов создайте и отправьте тег:
 
 ```powershell
-git tag v0.1.4-beta.1
-git push origin v0.1.4-beta.1
+git tag v0.1.4-beta.2
+git push origin v0.1.4-beta.2
 ```
 
 Workflow запускается также при загрузке изменений в `main`: он проверит тесты, соберёт пакет и опубликует два release assets: `module.json` и `forien-actors-summary.zip`. Если тега версии ещё нет, GitHub создаст его на публикуемом коммите. Для установки через `/releases/latest/` workflow явно делает этот выпуск latest, включая текущее beta-обозначение версии. Повторный выпуск с тем же тегом не перезаписывается: увеличьте версию и создайте новый тег. Ручной запуск workflow создаёт только скачиваемые артефакты сборки.
@@ -26,7 +26,7 @@ node --test tests/*.test.mjs
 node tools/release.mjs --repo Beast-Breacher/WFRP-Forien-Actor_Summary-Fork
 ```
 
-Создайте GitHub Release с тегом `v0.1.4-beta.1`, сделайте его latest, приложите **оба файла из `dist/`**. Не используйте автоматический GitHub `Source code.zip`: у него другая структура. При смене репозитория передайте `--repo owner/repository`; ссылки изменятся в обоих артефактах.
+Создайте GitHub Release с тегом `v0.1.4-beta.2`, сделайте его latest, приложите **оба файла из `dist/`**. Не используйте автоматический GitHub `Source code.zip`: у него другая структура. При смене репозитория передайте `--repo owner/repository`; ссылки изменятся в обоих артефактах.
 
 ## Foundry VTT
 

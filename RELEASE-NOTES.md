@@ -1,12 +1,14 @@
-## Forien's Actors Summary 0.1.4-beta.1
+## Forien's Actors Summary 0.1.4-beta.2
 
-Compatibility maintenance fork of Forien's original 0.1.3-beta module. The original interface, module ID, world settings and filter preset compendium are preserved.
+This update makes the Actors Summary window title and header text **white**, improving contrast with dark Foundry/system themes. The original interface, module ID, world settings and filter preset compendium are preserved.
 
 - Target Foundry VTT 11–14; live-tested on **14.369 with WFRP4e 10.1.2**. Generations 11–13 have not been separately runtime-tested.
-- Fix modern scene controls and relocated APIs, including removed legacy window-size constants.
-- Guard malformed drops and stale/deleted actors; release document subscriptions when cards close.
-- Fix rapid settings saves, optional attribute values, nested arrays, RegExp name fallback and column limits.
-- 16 regression and packaging tests passed, plus live-world smoke checks for rendering, filters, updates, compendium access, reopening and actor deletion.
+- `compatibility.verified` remains **14.369**, the version actually tested in a live WFRP4e world.
+- The new package version allows Foundry's normal update flow to refresh stale compatibility information from older installs.
+- White text is implemented in a small separate stylesheet; the original stylesheet and its source map are unchanged.
+- Existing compatibility and stability fixes from beta.1 are retained. 16 regression and packaging tests passed.
+
+If Foundry still reports "verified on version 11", return to Setup, update the module and restart the Foundry server. Refreshing only the browser tab does not reread a package manifest replaced on disk while the server was running.
 
 ### Install in Foundry
 

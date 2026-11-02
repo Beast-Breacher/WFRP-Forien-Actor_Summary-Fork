@@ -33,7 +33,7 @@ for(const dir of ['languages','packs']) {
     files.push([relative,await fs.readFile(full)]);
   }
 }
-for(const file of ['forien-actors-summary.js','compatibility.js','forien-actors-summary.css','forien-actors-summary.css.map','README.md','GITHUB-INSTALL-RU.md','CHANGELOG.md','TESTING.md','NOTICE.md','LICENSE'])files.push([file,await fs.readFile(path.join(root,file))]);
+for(const file of ['forien-actors-summary.js','compatibility.js','forien-actors-summary.css','compatibility.css','forien-actors-summary.css.map','README.md','GITHUB-INSTALL-RU.md','CHANGELOG.md','TESTING.md','NOTICE.md','LICENSE'])files.push([file,await fs.readFile(path.join(root,file))]);
 // Small, dependency-free ZIP writer (DEFLATE + CRC32), with files at the module root.
 function crc32(bytes) {let crc=0xFFFFFFFF;for(const b of bytes){crc^=b;for(let n=0;n<8;n++)crc=(crc>>>1)^((crc&1)?0xEDB88320:0);}return (crc^0xFFFFFFFF)>>>0;}
 const entries=[],central=[];let offset=0;

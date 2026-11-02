@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.1.4-beta.2
+* Make the summary window title and header text white for contrast with dark system themes.
+* Keep the verified core version at the live-tested Foundry 14.369 and publish a new version so normal module updates refresh cached package metadata.
+* Preserve the original stylesheet and source map; the override is a separate compatibility.css.
+
 ## v0.1.4-beta.1 (compatibility fork)
 * Target Foundry 11–14 with local API aliases and both scene-control formats.
 * Guard malformed drops, invalid session state, missing actors and stale IDs.
